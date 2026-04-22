@@ -3,38 +3,71 @@ package ch.xlan.bookin
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import ch.xlan.bookin.model.Book
+import ch.xlan.bookin.network.ApiClient
 import ch.xlan.bookin.ui.screens.LibraryScreen
 import ch.xlan.bookin.ui.theme.BookInTheme
-
-val sampleBooks = listOf(
-    Book(1, "Le Seigneur des Anneaux", "J.R.R. Tolkien", listOf("Fantasy", "Aventure")),
-    Book(2, "Le Petit Prince", "Antoine de Saint-Exupéry", listOf("Conte")),
-    Book(3, "1984", "George Orwell", listOf("Dystopie")),
-    Book(4, "Le Grimoire d'Arkandias", "Eric Boisset", listOf("Jeunesse", "Magie"))
-)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             BookInTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    LibraryScreen(
-                        books = sampleBooks,
-                        onBookClick = {  }
-                    )
+                    var apiBooks by remember { mutableStateOf<List<Book>>(emptyList()) }
+                    var isLoading by remember { mutableStateOf(true) }
+                    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+                    LaunchedEffect(Unit) {
+                        try {
+                            apiBooks = ApiClient.instance.getBooks()
+                        } catch (e: Exception) {
+                            errorMessage = e.toString()
+                        } finally {
+                            isLoading = false
+                        }
+                    }
+
+                    if (isLoading) {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
+                    } else if (errorMessage != null) {
+                        Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
+                            Text(text = "Erreur: $errorMessage")
+                        }
+                    } else {
+                        LibraryApp(books = apiBooks)
+                    }
                 }
             }
         }
     }
+}
+
+@Composable
+fun LibraryApp(books: List<Book>) {
+    LibraryScreen(
+        books = books,
+        onBookClick = { /* TODO */ }
+    )
 }

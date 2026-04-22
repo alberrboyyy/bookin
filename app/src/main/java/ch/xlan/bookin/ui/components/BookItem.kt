@@ -15,10 +15,11 @@ import androidx.compose.ui.unit.sp
 import ch.xlan.bookin.model.Book
 
 @Composable
-fun BookItem(book: Book,) {
+fun BookItem(book: Book, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onClick() }
             .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -44,27 +45,6 @@ fun BookItem(book: Book,) {
                 color = Color.Gray,
                 fontSize = 14.sp
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                book.tags.forEach { tag ->
-                    Surface(
-                        shape = RoundedCornerShape(16.dp),
-                        color = MaterialTheme.colorScheme.secondaryContainer
-                    ) {
-                        Text(
-                            text = tag,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                    }
-                }
-            }
         }
     }
 }

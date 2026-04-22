@@ -48,7 +48,7 @@ fun LibraryScreen(
 
             LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 items(filteredBooks) { book ->
-                    BookItem(book = book)
+                    BookItem(book = book, onClick = { onBookClick(book) })
                 }
             }
         }
