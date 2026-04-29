@@ -6,24 +6,17 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ch.xlan.bookin.model.Book
 import ch.xlan.bookin.network.ApiClient
+import ch.xlan.bookin.ui.screens.BookDetailScreen
 import ch.xlan.bookin.ui.screens.LibraryScreen
 import ch.xlan.bookin.ui.theme.BookInTheme
-import ch.xlan.bookin.ui.screens.BookDetailScreen
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,7 +47,7 @@ class MainActivity : ComponentActivity() {
                         }
                     } else if (errorMessage != null) {
                         Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
-                            Text(text = "Erreur: $errorMessage")
+                            Text(text = "$errorMessage")
                         }
                     } else {
                         LibraryApp(books = apiBooks)
@@ -67,21 +60,33 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun LibraryApp(books: List<Book>) {
-    var selectedBook by remember { mutableStateOf<Book?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
-    if (selectedBook == null) {
-        LibraryScreen(
-            books = books,
-            onBookClick = { book ->
-                selectedBook = book
+    val showMessage: (String) -> Unit = { message ->
+        scope.launch {
+            snackbarHostState.showSnackbar(message)
+        }
+    }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) { padding ->
+        Box(modifier = Modifier.padding(padding)) {
+            var selectedBook by remember { mutableStateOf<Book?>(null) }
+
+            if (selectedBook == null) {
+                LibraryScreen(
+                    books = books,
+                    onBookClick = { book -> selectedBook = book }
+                )
+            } else {
+                BookDetailScreen(
+                    book = selectedBook!!,
+                    onBack = { selectedBook = null },
+                    showMessage = showMessage
+                )
             }
-        )
-    } else {
-        BookDetailScreen(
-            book = selectedBook!!,
-            onBack = {
-                selectedBook = null
-            }
-        )
+        }
     }
 }
