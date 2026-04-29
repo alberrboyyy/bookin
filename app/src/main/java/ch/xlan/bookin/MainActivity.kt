@@ -23,6 +23,7 @@ import ch.xlan.bookin.model.Book
 import ch.xlan.bookin.network.ApiClient
 import ch.xlan.bookin.ui.screens.LibraryScreen
 import ch.xlan.bookin.ui.theme.BookInTheme
+import ch.xlan.bookin.ui.screens.BookDetailScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,8 +67,21 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun LibraryApp(books: List<Book>) {
-    LibraryScreen(
-        books = books,
-        onBookClick = { /* TODO */ }
-    )
+    var selectedBook by remember { mutableStateOf<Book?>(null) }
+
+    if (selectedBook == null) {
+        LibraryScreen(
+            books = books,
+            onBookClick = { book ->
+                selectedBook = book
+            }
+        )
+    } else {
+        BookDetailScreen(
+            book = selectedBook!!,
+            onBack = {
+                selectedBook = null
+            }
+        )
+    }
 }
