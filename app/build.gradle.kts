@@ -55,4 +55,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("nl.siegmann.epublib:epublib-core:3.1") {
+        exclude(group = "xmlpull")
+        exclude(group = "org.slf4j", module = "slf4j-simple")
+    }
+    implementation("org.slf4j:slf4j-android:1.7.36")
 }

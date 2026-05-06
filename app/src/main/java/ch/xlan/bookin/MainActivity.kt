@@ -16,6 +16,7 @@ import ch.xlan.bookin.network.ApiClient
 import ch.xlan.bookin.ui.screens.BookDetailScreen
 import ch.xlan.bookin.ui.screens.LibraryScreen
 import ch.xlan.bookin.ui.theme.BookInTheme
+import ch.xlan.bookin.ui.screens.ReaderScreen
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -74,16 +75,23 @@ fun LibraryApp(books: List<Book>) {
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
             var selectedBook by remember { mutableStateOf<Book?>(null) }
+            var isReading by remember { mutableStateOf(false) }
 
             if (selectedBook == null) {
                 LibraryScreen(
                     books = books,
                     onBookClick = { book -> selectedBook = book }
                 )
+            } else if (isReading) {
+                ReaderScreen(
+                    book = selectedBook!!,
+                    onBack = { isReading = false }
+                )
             } else {
                 BookDetailScreen(
                     book = selectedBook!!,
                     onBack = { selectedBook = null },
+                    onRead = { isReading = true },
                     showMessage = showMessage
                 )
             }

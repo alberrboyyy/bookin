@@ -16,6 +16,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+
+        maven { url = java.net.URI("https://raw.github.com/psiegman/mvn-repo/master/releases") }
     }
 }
 

@@ -22,7 +22,12 @@ import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookDetailScreen(book: Book, onBack: () -> Unit, showMessage: (String) -> Unit) {
+fun BookDetailScreen(
+    book: Book,
+    onBack: () -> Unit,
+    onRead: () -> Unit,
+    showMessage: (String) -> Unit
+) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
@@ -69,20 +74,18 @@ fun BookDetailScreen(book: Book, onBack: () -> Unit, showMessage: (String) -> Un
             Spacer(modifier = Modifier.weight(1f))
 
             if (isDownloaded) {
-                Button(
-                    onClick = {
-                        // TODO: Ajouter la navigation vers le lecteur EPUB
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary
-                    )
-                ) {
-                    Text("Lecture", fontSize = 18.sp)
-                }
+                            Button(
+                                onClick = onRead,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.secondary
+                                )
+                            ) {
+                                Text("Lecture", fontSize = 18.sp)
+                            }
             } else {
                 Button(
                     onClick = {
