@@ -67,32 +67,33 @@ fun BookDetailScreen(
             Text(text = book.author, fontSize = 20.sp, color = Color.Gray)
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = book.description ?: "Aucune description disponible.",
+                text = book.summary ?: "Aucune description disponible.",
                 fontSize = 16.sp
             )
 
             Spacer(modifier = Modifier.weight(1f))
 
             if (isDownloaded) {
-                            Button(
-                                onClick = onRead,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(56.dp),
-                                shape = RoundedCornerShape(12.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.secondary
-                                )
-                            ) {
-                                Text("Lecture", fontSize = 18.sp)
-                            }
-            } else {
+                Button(
+                    onClick = onRead,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary
+                    )
+                ) {
+                    Text("Lecture", fontSize = 18.sp)
+                }
+            } else if (book.epubFileUrl != null) {
                 Button(
                     onClick = {
                         coroutineScope.launch {
                             try {
+                                val url = book.epubFileUrl
                                 withContext(Dispatchers.IO) {
-                                    val response = ApiClient.instance.downloadBook(book.id)
+                                    val response = ApiClient.instance.downloadBook(url)
                                     response.byteStream().use { input ->
                                         bookFile.outputStream().use { output ->
                                             input.copyTo(output)
@@ -113,6 +114,13 @@ fun BookDetailScreen(
                 ) {
                     Text("Télécharger", fontSize = 18.sp)
                 }
+            } else {
+                Text(
+                    "Aucun fichier disponible",
+                    modifier = Modifier.fillMaxWidth().padding(8.dp),
+                    color = Color.Red,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
             }
         }
     }
